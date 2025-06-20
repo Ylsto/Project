@@ -40,14 +40,19 @@ class CartTransportJob : public CCmdData
 {
 private:
     // 请求命令参数
-    unsigned int kType;      // 任务类型
-    std::string StartPos;    // 起始位置坐标
-    std::string EndPos;      // 结束位置坐标
-    unsigned int StayTime;        // 转运停留时间，单位秒
-    unsigned int Num;             // 物料数目（仅类型1有效）
+    const unsigned int m_uCmd = 80; // 命令编号
+    const int m_nType = 1;          // 命令类型
+    unsigned long m_ulSeq = 0; // 请求序列号
+    int m_nLastStatus = 0;    // 上一次结束状态
+    std::string m_strTaskID;        // 任务ID
+    unsigned int m_nkType;      // 任务类型
+    std::string m_strStartPos;    // 起始位置坐标
+    std::string m_strEndPos;      // 结束位置坐标
+    unsigned int m_nStayTime;        // 转运停留时间，单位秒
+    unsigned int m_nNum;             // 物料数目（仅类型1有效）
 
     // 回应命令参数
-    unsigned int  ResponseTaskID = 80; // 回应的任务ID
+    std::string  m_strResponseTaskID ; // 回应的任务ID
 
 public:
     CartTransportJob(){};
@@ -63,8 +68,9 @@ class JobStatusReport : public CCmdData
 {
 private:
     // 请求命令参数
-    unsigned int ReportType; // 反馈类型
-    std::string Remark;      // 附加信息
+    std::string m_strTaskID; // 任务执行ID
+    unsigned int m_nReportType; // 反馈类型
+    std::string m_strRemark;      // 附加信息
 
 public:
     JobStatusReport(){};
@@ -78,10 +84,15 @@ class TaskControl : public CCmdData
 {
 private:
     // 请求命令参数
-    unsigned int ControlCode;    // 控制类型
+    const unsigned int m_uCmd = 82; // 命令编号
+    const int m_nType = 2;          // 命令类型
+    unsigned long m_ulSeq = 0;      // 请求序列号
+    int m_nLastStatus = 0;          // 上一次结束状态
+    std::string m_strTaskID; // 任务ID
+    unsigned int m_nControlCode;    // 控制类型
 
     // 回应命令参数
-    unsigned int ResponseTaskID = 82;  // 回应的任务ID
+    std::string m_strResponseTaskID ;  // 回应的任务ID
 
 public:
     TaskControl() {};
@@ -96,11 +107,11 @@ class WarehouseJobCompletion : public CCmdData
 {
 private:
     // 请求命令参数
-    std::vector<nlohmann::json> BOM;      // 物料信息数组
-    unsigned int Total;                   // 物料总数量
+    std::vector<nlohmann::json> m_vecBOM;      // 物料信息数组
+    unsigned int m_nTotal;                   // 物料总数量
 
     // 回应命令参数
-    unsigned int ResponseMessage = 83;     // 回应消息
+    unsigned int m_nResponseMessage = 83;     // 回应消息
 
 public:
     WarehouseJobCompletion() {};
@@ -109,14 +120,14 @@ public:
     bool AnalyzeData(nlohmann::json& data) override;          // 解析仓储作业完成通知请求
     virtual std::string ToJsonString() const override;        // 生成仓储作业完成通知回应的 JSON 字符串
      // 获取和设置物料信息数组
-    const std::vector<nlohmann::json>& GetBOM() const { return BOM; }
-    void SetBOM(const std::vector<nlohmann::json>& bom) { BOM = bom; }
+    const std::vector<nlohmann::json>& GetBOM() const { return m_vecBOM; }
+    void SetBOM(const std::vector<nlohmann::json>& bom) { m_vecBOM = bom; }
 
     // 获取和设置物料总数量
-    unsigned int GetTotal() const { return Total; }
-    void SetTotal(unsigned int total) { Total = total; }
+    unsigned int GetTotal() const { return m_nTotal; }
+    void SetTotal(unsigned int total) { m_nTotal = total; }
 
     // 获取和设置回应消息
-    unsigned int GetResponseMessage() const { return ResponseMessage; }
-    void SetResponseMessage(unsigned int msg) { ResponseMessage = msg; }
+    unsigned int GetResponseMessage() const { return m_nResponseMessage; }
+    void SetResponseMessage(unsigned int msg) { m_nResponseMessage = msg; }
 };
